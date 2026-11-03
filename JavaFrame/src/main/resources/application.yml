@@ -1,0 +1,81 @@
+spring:
+  application:
+    name: JavaFrame
+  profiles:
+    active: dev
+  threads:
+    virtual:
+      enabled: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+server:
+  shutdown: graceful
+  error:
+    include-stacktrace: never
+    include-message: never
+
+logging:
+  pattern:
+    correlation: "[%X{traceId:-}] "
+
+management:
+  endpoints:
+    web:
+      discovery:
+        enabled: false
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: ${spring.application.name}
+
+app:
+  jwt:
+    access-token-minutes: 30
+    refresh-token-days: 7
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+server:
+  port: 8080
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+app:
+  auth:
+    username: admin
+    password: ${APP_AUTH_PASSWORD:admin123}
+  jwt:
+    secret: ${APP_JWT_SECRET:dev-only-secret-change-me-32bytes}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+server:
+  port: 8080
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+app:
+  auth:
+    username: ${APP_AUTH_USERNAME}
+    password: ${APP_AUTH_PASSWORD}
+  jwt:
+    secret: ${APP_JWT_SECRET}
